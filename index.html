@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Grande Jornada das Sílabas — Aventura de Acentuação</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    /* Paleta Aventura Natural */
+    --ceu-1:#7ec8e3; --ceu-2:#a8e0d4; --ceu-3:#d6f0c8;
+    --folha:#3a9d5d; --folha-esc:#27733f; --folha-clara:#6fd08a;
+    --terra:#8a5a3b; --terra-esc:#5e3a23; --areia:#f3e2bf;
+    --sol:#ffd34e; --sol-esc:#f2a73b;
+    --agua:#2f9bd4; --agua-esc:#1d6fa5;
+    --tinta:#23371f; --creme:#fbf7ec;
+    --coral:#ef7a52; --coral-esc:#d65a36;
+    --sombra: rgba(30, 50, 25, 0.22);
+    --sombra-forte: rgba(30, 50, 25, 0.38);
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Trebuchet MS", "Segoe UI", Verdana, sans-serif;
+    background:
+      radial-gradient(circle at 15% 8%, rgba(255,211,78,0.45), transparent 30%),
+      radial-gradient(circle at 85% 12%, rgba(126,200,227,0.5), transparent 35%),
+      radial-gradient(circle at 50% 100%, rgba(58,157,93,0.4), transparent 55%),
+      linear-gradient(180deg, var(--ceu-1) 0%, var(--ceu-2) 45%, var(--ceu-3) 100%);
+    background-attachment: fixed;
+    color: var(--tinta); min-height: 100vh; padding: 16px; line-height: 1.5;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+
+  .palco {
+    max-width: 900px; margin: 0 auto;
+    background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(251,247,236,0.96));
+    border: 3px solid rgba(255,255,255,0.7);
+    border-radius: 28px;
+    box-shadow: 0 18px 40px var(--sombra-forte), inset 0 2px 0 rgba(255,255,255,0.9);
+    overflow: hidden;
+    backdrop-filter: blur(6px);
+  }
+
+  /* ===== Cabeçalho com paisagem ===== */
+  header {
+    position: relative; color: #fff; padding: 26px 24px 30px; text-align: center;
+    background:
+      linear-gradient(180deg, rgba(31,111,165,0) 0%, rgba(39,115,63,0.25) 100%),
+      linear-gradient(160deg, var(--agua) 0%, var(--folha) 70%, var(--folha-esc) 100%);
+    overflow: hidden;
+  }
+  header::after{
+    content:""; position:absolute; left:0; right:0; bottom:-2px; height:26px;
+    background:
+      radial-gradient(circle at 10% 0, var(--folha-esc) 12px, transparent 13px),
+      radial-gradient(circle at 30% 0, var(--folha-esc) 16px, transparent 17px),
+      radial-gradient(circle at 50% 0, var(--folha-esc) 12px, transparent 13px),
+      radial-gradient(circle at 70% 0, var(--folha-esc) 16px, transparent 17px),
+      radial-gradient(circle at 90% 0, var(--folha-esc) 12px, transparent 13px);
+    background-repeat:no-repeat;
+  }
+  header h1 { font-size: 1.85em; letter-spacing: 0.5px; text-shadow: 0 2px 0 rgba(0,0,0,0.25), 0 0 18px rgba(255,255,255,0.3); position:relative; z-index:2; }
+  header p { font-size: 0.95em; margin-top: 4px; opacity: 0.96; position:relative; z-index:2; }
+  .sol-deco{ position:absolute; top:-30px; right:-30px; width:120px; height:120px; border-radius:50%;
+    background: radial-gradient(circle, var(--sol) 30%, rgba(255,211,78,0) 70%); z-index:1; animation: brilho 4s ease-in-out infinite alternate; }
+  @keyframes brilho { from{ opacity:0.6; transform:scale(1);} to{ opacity:1; transform:scale(1.12);} }
+
+  /* ===== HUD / placar ===== */
+  .placar {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+    gap: 8px; padding: 12px 16px;
+    background: linear-gradient(180deg, var(--areia), #ecd9b0);
+    border-bottom: 3px solid rgba(138,90,59,0.35); font-weight: bold;
+  }
+  .placar .item {
+    background: linear-gradient(180deg,#ffffff,#f3ead2); border: 2px solid rgba(138,90,59,0.4);
+    border-radius: 30px; padding: 6px 15px; font-size: 0.9em;
+    box-shadow: 0 3px 0 rgba(138,90,59,0.25), inset 0 1px 0 #fff;
+  }
+
+  main { padding: 24px 26px 30px; }
+
+  .fase-tag {
+    display: inline-block; color: #fff; font-weight: bold; padding: 5px 16px;
+    border-radius: 30px; font-size: 0.82em; margin-bottom: 12px; letter-spacing:0.3px;
+    background: linear-gradient(180deg, var(--folha-clara), var(--folha));
+    box-shadow: 0 4px 0 var(--folha-esc), inset 0 1px 0 rgba(255,255,255,0.5);
+  }
+  .fase-tag.bonus { background: linear-gradient(180deg, var(--sol), var(--sol-esc)); box-shadow: 0 4px 0 #c47e1e, inset 0 1px 0 rgba(255,255,255,0.6); color:#5e3a23; }
+  h2.titulo-fase { font-size: 1.4em; margin-bottom: 8px; color: var(--folha-esc); text-shadow:0 1px 0 #fff; }
+
+  .instrucao {
+    background: linear-gradient(180deg, #fff8e6, #fdeecb);
+    border: 2px solid var(--sol); border-left: 7px solid var(--sol-esc);
+    padding: 11px 15px; border-radius: 14px; margin-bottom: 14px; font-size: 0.96em;
+    box-shadow: inset 0 1px 0 #fff;
+  }
+  .narrativa {
+    position:relative;
+    background: linear-gradient(180deg, #eaf7ee, #d9f0e0);
+    border: 2px solid var(--folha-clara); border-radius: 16px;
+    padding: 12px 15px 12px 16px; margin-bottom: 16px; font-size: 0.95em; font-style: italic;
+    box-shadow: inset 0 1px 0 #fff;
+  }
+  .narrativa b { font-style: normal; }
+
+  .progresso-fase { display:flex; gap:6px; justify-content:center; margin-bottom:16px; flex-wrap:wrap; }
+  .ponto-q { width:16px; height:16px; border-radius:50%; border:2px solid var(--folha-esc);
+    background:#fff; box-shadow: inset 0 -2px 2px rgba(0,0,0,0.08); transition: transform .15s; }
+  .ponto-q.ok { background: radial-gradient(circle at 35% 30%, var(--folha-clara), var(--folha)); }
+  .ponto-q.no { background: radial-gradient(circle at 35% 30%, #ff9b7a, var(--coral)); border-color: var(--coral-esc); }
+  .ponto-q.atual { background: radial-gradient(circle at 35% 30%, var(--sol), var(--sol-esc)); border-color:#c47e1e; transform: scale(1.25); }
+
+  .pergunta { text-align: center; font-size: 1.08em; margin-bottom: 8px; }
+  .palavra-grande {
+    font-size: 2.5em; font-weight: bold; text-align: center; margin: 16px 0 22px;
+    color: var(--terra-esc); letter-spacing: 1px; text-shadow: 0 2px 0 rgba(255,255,255,0.8);
+  }
+  .silaba {
+    display: inline-block; padding: 6px 13px; margin: 3px; border-radius: 14px; cursor: pointer;
+    border: 3px solid transparent; background: linear-gradient(180deg,#fff,#f0f6ee);
+    box-shadow: 0 4px 0 rgba(58,157,93,0.3); transition: transform 0.1s, box-shadow 0.1s, background 0.1s;
+  }
+  .silaba:hover { background: linear-gradient(180deg,#fffbe9,#fff0c2); transform: translateY(-4px); box-shadow: 0 8px 0 rgba(242,167,59,0.4); }
+  .silaba.escolhida-certa { background: linear-gradient(180deg,var(--folha-clara),var(--folha)); color:#fff; border-color:var(--folha-esc); box-shadow: 0 4px 0 var(--folha-esc); }
+  .silaba.escolhida-erro { background: linear-gradient(180deg,#ff9b7a,var(--coral)); color:#fff; border-color:var(--coral-esc); box-shadow: 0 4px 0 var(--coral-esc); }
+
+  .opcoes { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 12px 0 6px; }
+  @media (max-width: 520px){ .opcoes { grid-template-columns: 1fr; } }
+
+  button.opcao {
+    font-family: inherit; font-size: 1.05em; font-weight: bold; padding: 15px;
+    border: none; border-radius: 16px; color: var(--tinta); cursor: pointer;
+    background: linear-gradient(180deg,#ffffff,#eef4ea);
+    box-shadow: 0 5px 0 rgba(58,157,93,0.35), inset 0 1px 0 #fff; transition: transform 0.08s, box-shadow 0.08s, background .1s;
+  }
+  button.opcao:hover { background: linear-gradient(180deg,#eafbef,#cdeed4); }
+  button.opcao:active { transform: translateY(4px); box-shadow: 0 1px 0 rgba(58,157,93,0.35); }
+  button.opcao:focus-visible { outline: 4px solid var(--sol); outline-offset: 3px; }
+  button.opcao.certa { background: linear-gradient(180deg,var(--folha-clara),var(--folha)); color:#fff; box-shadow:0 5px 0 var(--folha-esc); }
+  button.opcao.errada { background: linear-gradient(180deg,#ff9b7a,var(--coral)); color:#fff; box-shadow:0 5px 0 var(--coral-esc); }
+  button.opcao:disabled { cursor: default; }
+
+  .feedback { min-height: 30px; text-align: center; font-weight: bold; font-size: 1.08em; margin: 16px 0 6px; }
+  .feedback.ok { color: var(--folha-esc); } .feedback.nao { color: var(--coral-esc); }
+  .dica { background: linear-gradient(180deg,#eaf7f4,#d6efe9); border: 2px dashed var(--agua);
+    border-radius: 14px; padding: 9px 13px; font-size: 0.9em; margin-top: 10px; display: none; }
+  .dica.mostrar { display: block; }
+
+  .navega { text-align: center; margin-top: 20px; }
+  button.principal {
+    font-family: inherit; font-size: 1.12em; font-weight: bold; padding: 14px 30px;
+    border: none; border-radius: 34px; color: #fff; cursor: pointer; letter-spacing:0.3px;
+    background: linear-gradient(180deg, var(--coral), var(--coral-esc));
+    box-shadow: 0 6px 0 #a8401f, 0 10px 18px rgba(214,90,54,0.35), inset 0 1px 0 rgba(255,255,255,0.4);
+    transition: transform 0.08s, box-shadow 0.08s;
+  }
+  button.principal:hover { filter: brightness(1.05); }
+  button.principal:active { transform: translateY(5px); box-shadow: 0 1px 0 #a8401f, inset 0 1px 0 rgba(255,255,255,0.4); }
+  button.principal:focus-visible { outline: 4px solid var(--sol); outline-offset: 3px; }
+  button.principal[disabled] { background: linear-gradient(180deg,#c3c9bf,#a9b0a4); box-shadow:0 6px 0 #8a9184; cursor:default; filter:none; }
+  button.principal.verde { background: linear-gradient(180deg, var(--folha-clara), var(--folha)); box-shadow: 0 6px 0 var(--folha-esc), 0 10px 18px rgba(39,115,63,0.3); }
+
+  .tela-inicio { text-align: center; padding: 12px 0; }
+  .tela-inicio .mascote { font-size: 4.6em; filter: drop-shadow(0 8px 10px rgba(0,0,0,0.18)); animation: flutua 3s ease-in-out infinite; }
+  @keyframes flutua { 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-10px);} }
+  .campo-nome {
+    font-family: inherit; font-size: 1.1em; padding: 12px 16px; border: 3px solid var(--folha);
+    border-radius: 16px; text-align:center; width: 80%; max-width: 340px; margin: 12px auto;
+    background:#fff; box-shadow: inset 0 2px 4px rgba(0,0,0,0.06);
+  }
+  .campo-nome:focus { outline: 4px solid var(--sol); border-color: var(--folha-esc); }
+
+  .mapa-titulo { text-align:center; color:var(--folha-esc); margin: 4px 0 14px; font-size:1.2em; }
+  .mapa { background: linear-gradient(180deg, #d8f0e0, #f3e8c8); border: 3px solid var(--folha);
+    border-radius: 18px; padding: 14px 10px; margin-bottom: 8px; }
+  .trilha-mapa { display:flex; flex-direction:column; gap: 6px; }
+  .ilha { display:flex; align-items:center; gap:12px; background:linear-gradient(180deg,#fff,#f4f9f1);
+    border:2px solid rgba(58,157,93,0.4); border-radius:16px; padding:11px 15px;
+    box-shadow: 0 4px 0 rgba(58,157,93,0.22); }
+  .ilha.bonus-ilha { background: linear-gradient(180deg,#fff7e6,#ffeec6); border-color: var(--sol-esc); }
+  .ilha .icone { font-size:1.9em; flex-shrink:0; width:44px; text-align:center; }
+  .ilha .info { flex:1; text-align:left; }
+  .ilha .info b { color: var(--folha-esc); }
+  .ilha .info small { color:#5e6b54; }
+  .ilha .status { font-size:1.4em; flex-shrink:0; }
+  .ilha.bloqueada { opacity: 0.5; filter: grayscale(60%); }
+  .ilha.atual { border-color: var(--coral); box-shadow: 0 4px 0 var(--coral-esc); }
+  .conector { text-align:center; font-size:1.1em; color: var(--folha); line-height:0.5; }
+
+  .transicao { display:none; text-align:center; padding: 18px 0; }
+  .transicao.ativa { display:block; }
+  .transicao .big { font-size: 3.8em; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.18)); animation: pop .5s ease; }
+  @keyframes pop { 0%{ transform:scale(0.4); opacity:0;} 70%{ transform:scale(1.15);} 100%{ transform:scale(1); opacity:1;} }
+  .badge { display:inline-block; border-radius:30px; padding:8px 20px; font-weight:bold; margin:10px 0; color:#5e3a23;
+    background: linear-gradient(180deg, var(--sol), var(--sol-esc)); box-shadow: 0 5px 0 #c47e1e, inset 0 1px 0 rgba(255,255,255,0.6); }
+
+  .intervalo { display:none; padding: 8px 0; }
+  .intervalo.ativa { display:block; }
+  .cartao-coruja { position:relative; background:linear-gradient(180deg,#eef9f1,#dcf0e1);
+    border:3px solid var(--folha-clara); border-radius:20px; padding:18px; margin:8px 0; text-align:center;
+    box-shadow: inset 0 1px 0 #fff, 0 8px 20px rgba(39,115,63,0.15); }
+  .cartao-coruja .cor { font-size:3.4em; animation: flutua 3s ease-in-out infinite; }
+  .cartao-coruja h3 { color: var(--folha-esc); margin:6px 0; }
+  .curiosidade { background:#fff; border:2px dashed var(--sol-esc); border-radius:14px; padding:11px 15px; margin-top:12px; font-size:0.95em; }
+
+  .relatorio { display: none; }
+  .relatorio.ativo { display: block; }
+  .selo { text-align: center; font-size: 3.8em; margin: 4px 0; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.18)); animation: pop .6s ease; }
+  table.rel { width: 100%; border-collapse: separate; border-spacing:0; margin: 16px 0; font-size: 0.9em; border-radius:14px; overflow:hidden; box-shadow:0 6px 16px var(--sombra); }
+  table.rel th, table.rel td { border-bottom: 1px solid rgba(58,157,93,0.25); padding: 9px 11px; text-align: left; }
+  table.rel th { background: linear-gradient(180deg, var(--folha), var(--folha-esc)); color:#fff; }
+  table.rel tr:nth-child(even) td { background: #f3f9ef; }
+  table.rel tfoot th { background: linear-gradient(180deg, var(--terra), var(--terra-esc)); }
+  .barra-fora { background:#e6ecdd; border:2px solid var(--folha); border-radius:24px; height: 28px; overflow:hidden; margin: 12px 0 4px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.08); }
+  .barra-dentro { height:100%; background: linear-gradient(90deg, var(--sol), var(--folha-clara), var(--folha)); width:0;
+    text-align:center; color:#fff; font-weight:bold; line-height:28px; transition: width 1s ease; text-shadow:0 1px 1px rgba(0,0,0,0.2); }
+  .botoes-rel { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:16px; }
+  .escondido { display: none !important; }
+
+  /* ===== CAÇA-PALAVRAS ===== */
+  .cp-wrap { display:flex; flex-wrap:wrap; gap:18px; justify-content:center; }
+  .cp-grade { display:grid; gap:4px; background:linear-gradient(180deg,var(--folha),var(--folha-esc)); padding:8px; border-radius:14px; box-shadow:0 6px 14px var(--sombra); }
+  .cp-cel { width:32px; height:32px; background:linear-gradient(180deg,#fff,#eef4ea); border-radius:7px; display:flex; align-items:center;
+    justify-content:center; font-weight:bold; cursor:pointer; font-size:0.95em; -moz-user-select:none; user-select:none; box-shadow: inset 0 1px 0 #fff; }
+  .cp-cel:hover { background:linear-gradient(180deg,#fffbe9,#fff0c2); }
+  .cp-cel.sel { background:linear-gradient(180deg,var(--sol),var(--sol-esc)); }
+  .cp-cel.achou { background:linear-gradient(180deg,var(--folha-clara),var(--folha)); color:#fff; }
+  @media (max-width:520px){ .cp-cel { width:25px; height:25px; font-size:0.78em; } }
+  .cp-lista { min-width:150px; }
+  .cp-lista h4 { color:var(--folha-esc); margin-bottom:6px; }
+  .cp-palavra { padding:6px 10px; border:2px solid var(--folha); border-radius:10px; margin:5px 0; background:#fff; font-weight:bold; box-shadow:0 3px 0 rgba(58,157,93,0.2); }
+  .cp-palavra.ok { background:linear-gradient(180deg,var(--folha-clara),var(--folha)); color:#fff; text-decoration:line-through; box-shadow:0 3px 0 var(--folha-esc); }
+
+  /* ===== MEMÓRIA ===== */
+  .mem-grade { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; max-width:460px; margin:0 auto; }
+  @media (max-width:520px){ .mem-grade { grid-template-columns:repeat(3,1fr); } }
+  .mem-carta { height:84px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; color:#fff; font-weight:bold; font-size:0.95em; text-align:center; padding:5px;
+    background:linear-gradient(160deg, var(--agua), var(--agua-esc)); box-shadow:0 5px 0 var(--terra-esc), inset 0 1px 0 rgba(255,255,255,0.3);
+    transition: transform .15s; }
+  .mem-carta:hover { transform: translateY(-3px); }
+  @media (max-width:520px){ .mem-carta { height:70px; font-size:0.82em; } }
+  .mem-carta.virada { background:linear-gradient(180deg,#fff,#eef4ea); color:var(--tinta); box-shadow:0 5px 0 rgba(58,157,93,0.3); }
+  .mem-carta.par { background:linear-gradient(180deg,var(--folha-clara),var(--folha)); color:#fff; cursor:default; box-shadow:0 5px 0 var(--folha-esc); }
+  .mem-carta .frente { display:none; } .mem-carta.virada .frente, .mem-carta.par .frente { display:block; }
+  .mem-carta .verso { font-size:1.5em; } .mem-carta.virada .verso, .mem-carta.par .verso { display:none; }
+
+  /* ===== QUEBRA-CABEÇA ===== */
+  .qc-alvo { min-height:64px; border:3px dashed var(--folha); border-radius:16px; padding:12px;
+    display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:center; margin-bottom:14px; background:#f4fbf2; }
+  .qc-banco { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-bottom:12px; }
+  .qc-peca { padding:10px 16px; border-radius:14px; font-weight:bold; font-size:1.15em; cursor:pointer; color:#5e3a23;
+    background:linear-gradient(180deg,var(--sol),var(--sol-esc)); box-shadow:0 5px 0 #c47e1e, inset 0 1px 0 rgba(255,255,255,0.5); }
+  .qc-peca:hover { filter:brightness(1.05); transform:translateY(-2px); }
+  .qc-peca.usada { opacity:0.3; cursor:default; }
+  .qc-slot { padding:10px 16px; background:#fff; border:3px solid var(--agua); border-radius:14px; font-weight:bold; font-size:1.15em; min-width:48px; text-align:center; }
+
+  .vf-frase { font-size:1.35em; text-align:center; margin:18px 0; font-weight:bold; color:var(--agua-esc); text-shadow:0 1px 0 #fff; }
+
+  footer.rodape { text-align:center; font-size:0.8em; color:#6b7560; padding: 12px; border-top: 2px dashed rgba(58,157,93,0.4); }
+
+  /* ===== MAPA DE NAVEGAÇÃO NO MAR ===== */
+  .mar-mapa {
+    position: relative; height: 158px; margin: 16px auto; max-width: 780px;
+    background:
+      linear-gradient(180deg, rgba(126,200,227,0.5), transparent 40%),
+      linear-gradient(180deg, #6fc3e0 0%, var(--agua) 55%, var(--agua-esc) 100%);
+    border: 3px solid #fff; border-radius: 20px; overflow: hidden;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.15), 0 8px 20px var(--sombra);
+  }
+  .mar-ondas { position:absolute; bottom:8px; left:0; width:200%; color:#ffffff; opacity:0.35;
+    font-size:1.5em; white-space:nowrap; letter-spacing:2px; animation: ondas 6s linear infinite; }
+  @keyframes ondas { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  .mar-trilha { position:absolute; top:50px; left:0; width:100%; height:40px;
+    display:flex; align-items:center; justify-content:space-between; padding:0 14px; }
+  .mar-ilhota { font-size:1.5em; position:relative; z-index:2; text-align:center; filter: drop-shadow(0 3px 3px rgba(0,0,0,0.2)); }
+  .mar-ilhota .lab { position:absolute; top:26px; left:50%; transform:translateX(-50%);
+    font-size:0.4em; background:#fff; border:2px solid var(--folha); border-radius:8px;
+    padding:0 5px; white-space:nowrap; font-weight:bold; color:var(--folha-esc); }
+  .mar-ilhota.destino { animation: pisca 0.8s ease-in-out infinite alternate; }
+  @keyframes pisca { from { transform: scale(1); } to { transform: scale(1.35); } }
+  .mar-navio { position:absolute; top:34px; left:14px; font-size:2em; z-index:3; transition: left 2.2s ease-in-out; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.25)); }
+  .mar-pontilhado { position:absolute; top:64px; left:14px; right:14px; height:0; border-top:3px dotted rgba(255,255,255,0.75); z-index:1; }
+  @media (max-width:560px){ .mar-ilhota { font-size:1.15em; } .mar-ilhota .lab { font-size:0.48em; } .mar-navio { font-size:1.6em; } }
+
+</style>
+</head>
+<body>
+<div class="palco">
+  <header>
+    <div class="sol-deco"></div>
+    <h1>🗺️ A Grande Jornada das Sílabas</h1>
+    <p>Aventura de Acentuação, Sílaba Tônica e Classificação</p>
+  </header>
+
+  <div class="placar">
+    <span class="item">🧭 <span id="nome-jogador">Explorador</span></span>
+    <span class="item">⭐ <span id="pontos">0</span> pts</span>
+    <span class="item estrelas" id="vidas">❤️ ❤️ ❤️</span>
+    <span class="item">🏝️ <span id="fase-num">0</span>/<span id="fase-total">12</span></span>
+  </div>
+
+  <main>
+    <section id="tela-inicio" class="tela-inicio">
+      <div class="mascote">🦉</div>
+      <h2 class="titulo-fase">Bem-vindo à Ilha das Palavras!</h2>
+      <p style="margin:8px 0;">Eu sou a <b>Coruja Letra</b>. Um vento travesso bagunçou todos os acentos do reino!
+      Só um verdadeiro explorador pode atravessar todas as <b>ilhas</b> e devolver a ordem às palavras.
+      Há ilhas de desafios e <b>ilhas bônus</b> com jogos especiais. Entre uma e outra, paramos para descansar. Vamos?</p>
+      <p style="margin-top:14px;font-weight:bold;">Como você quer ser chamado, explorador?</p>
+      <input type="text" id="input-nome" class="campo-nome" maxlength="16" placeholder="Digite seu nome aqui">
+      <div class="navega"><button class="principal" id="btn-comecar">▶ Começar a aventura!</button></div>
+    </section>
+
+    <section id="tela-mapa" class="escondido">
+      <div class="mapa-titulo">🗺️ O Mapa da Jornada</div>
+      <div class="mapa"><div class="trilha-mapa" id="trilha-mapa"></div></div>
+      <div class="navega"><button class="principal" id="btn-embarcar">⛵ Embarcar</button></div>
+    </section>
+
+    <!-- INTERVALO DA CORUJA (entre fases) -->
+    <section id="tela-intervalo" class="intervalo">
+      <div class="cartao-coruja">
+        <div class="cor">🦉</div>
+        <h3 id="int-titulo">Pausa para respirar!</h3>
+        <p id="int-incentivo"></p>
+        <div class="curiosidade" id="int-curiosidade"></div>
+      </div>
+      <div class="navega"><button class="principal" id="btn-fim-intervalo">Seguir viagem ➜</button></div>
+    </section>
+
+    <section id="tela-transicao" class="transicao">
+      <div class="big" id="trans-icone">🎉</div>
+      <h2 class="titulo-fase" id="trans-titulo"></h2>
+      <div class="badge" id="trans-badge"></div>
+
+      <!-- MAPA DE NAVEGAÇÃO NO MAR -->
+      <div class="mar-mapa" id="mar-mapa">
+        <div class="mar-ondas">～～～～～～～～～～～～</div>
+        <div class="mar-trilha" id="mar-trilha"></div>
+        <div class="mar-navio" id="mar-navio">⛵</div>
+      </div>
+
+      <p id="trans-texto" style="margin:8px 0;"></p>
+      <div class="navega"><button class="principal" id="btn-continuar-mapa">Continuar ➜</button></div>
+    </section>
+
+    <!-- JOGO DE PERGUNTAS (fases normais) -->
+    <section id="area-jogo" class="escondido">
+      <span class="fase-tag" id="fase-tag">Ilha 1</span>
+      <h2 class="titulo-fase" id="fase-titulo"></h2>
+      <div class="narrativa" id="fase-narrativa"></div>
+      <div class="instrucao" id="fase-instrucao"></div>
+      <div class="progresso-fase" id="progresso-fase"></div>
+      <div class="pergunta" id="pergunta-texto"></div>
+      <div class="palavra-grande" id="palavra-area"></div>
+      <div class="opcoes" id="opcoes-area"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="dica" id="dica"></div>
+      <div class="navega"><button class="principal" id="btn-proximo" disabled>Próxima ➜</button></div>
+    </section>
+
+    <!-- ÁREA GENÉRICA PARA FASES BÔNUS -->
+    <section id="area-bonus" class="escondido">
+      <span class="fase-tag bonus" id="bonus-tag">Fase Bônus</span>
+      <h2 class="titulo-fase" id="bonus-titulo"></h2>
+      <div class="narrativa" id="bonus-narrativa"></div>
+      <div class="instrucao" id="bonus-instrucao"></div>
+      <div id="bonus-conteudo"></div>
+      <div class="feedback" id="bonus-feedback"></div>
+      <div class="navega"><button class="principal" id="btn-bonus-fim" disabled>Concluir ➜</button></div>
+    </section>
+
+    <section id="relatorio" class="relatorio">
+      <div class="selo" id="selo">🏆</div>
+      <h2 class="titulo-fase" style="text-align:center;" id="rel-titulo">Relatório Final</h2>
+      <p style="text-align:center;" id="rel-frase"></p>
+      <div class="barra-fora"><div class="barra-dentro" id="barra"></div></div>
+      <table class="rel">
+        <thead><tr><th>Etapa</th><th>Nome</th><th>Acertos</th><th>Resultado</th></tr></thead>
+        <tbody id="rel-corpo"></tbody>
+        <tfoot><tr><th colspan="2">TOTAL</th><th id="rel-total"></th><th id="rel-total-res"></th></tr></tfoot>
+      </table>
+      <div id="rel-dicas" style="background:#e7f6f4;border:2px dashed var(--turquesa);border-radius:10px;padding:10px 14px;font-size:0.92em;"></div>
+      <div class="botoes-rel">
+        <button class="principal" onclick="window.print()">🖨️ Imprimir relatório</button>
+        <button class="principal" style="background:var(--turquesa);" id="btn-reiniciar">🔄 Nova jornada</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">Atividade pedagógica • 4º ano do Ensino Fundamental • Língua Portuguesa</footer>
+</div>
+<script>
+/* =====================================================================
+   A GRANDE JORNADA DAS SÍLABAS — versão completa
+   Fases normais (10 palavras cada) + fases bônus + intervalos da Coruja.
+   JavaScript básico para compatibilidade com Firefox 106.
+   ===================================================================== */
+
+/* ---------------- BANCO DE FASES ---------------- */
+var FASES = [
+  /* 0 - SÍLABA TÔNICA */
+  { tipoFase:"quiz", icone:"🌋", nome:"Vulcão da Força", titulo:"Ilha 1 — O Vulcão da Força",
+    narrativa:"No alto do vulcão, cada palavra explode com mais força em UMA sílaba. Encontre-a antes que a lava suba!",
+    instrucao:"A sílaba tônica é a que falamos com MAIS força. Diga a palavra em voz alta e clique na sílaba mais forte.",
+    tipo:"tonica",
+    questoes:[
+      { silabasReais:["ca","der","no"], certa:1, dica:"ca-DER-no — força em 'der'." },
+      { silabasReais:["ja","ne","la"], certa:1, dica:"ja-NE-la — força em 'ne'." },
+      { silabasReais:["bo","ne","ca"], certa:1, dica:"bo-NE-ca — força no meio." },
+      { silabasReais:["lá","pis"], certa:0, dica:"O acento entrega: LÁ-pis." },
+      { silabasReais:["ca","fé"], certa:1, dica:"ca-FÉ — força na última." },
+      { silabasReais:["bo","la"], certa:0, dica:"BO-la — força no começo." },
+      { silabasReais:["pro","fes","sor"], certa:2, dica:"pro-fes-SOR — força na última." },
+      { silabasReais:["es","co","la"], certa:1, dica:"es-CO-la — força em 'co'." },
+      { silabasReais:["fu","te","bol"], certa:2, dica:"fu-te-BOL — força na última." },
+      { silabasReais:["sa","pa","to"], certa:1, dica:"sa-PA-to — força em 'pa'." }
+    ] },
+  /* 1 - CONTAR SÍLABAS */
+  { tipoFase:"quiz", icone:"🏖️", nome:"Praia das Contagens", titulo:"Ilha 2 — A Praia das Contagens",
+    narrativa:"Para soltar os caranguejos presos, conte quantas sílabas tem cada palavra!",
+    instrucao:"Separe a palavra falando devagar e conte as sílabas. Clique no número certo.",
+    tipo:"contar",
+    questoes:[
+      { palavra:"bola", opcoes:["1","2","3","4"], certa:1, dica:"bo-la = 2 (dissílaba)." },
+      { palavra:"casa", opcoes:["1","2","3","4"], certa:1, dica:"ca-sa = 2 sílabas." },
+      { palavra:"cavalo", opcoes:["2","3","4","5"], certa:1, dica:"ca-va-lo = 3 (trissílaba)." },
+      { palavra:"sol", opcoes:["1","2","3","4"], certa:0, dica:"sol = 1 (monossílaba)." },
+      { palavra:"borboleta", opcoes:["2","3","4","5"], certa:2, dica:"bor-bo-le-ta = 4." },
+      { palavra:"pé", opcoes:["1","2","3","4"], certa:0, dica:"pé = 1 sílaba." },
+      { palavra:"janela", opcoes:["2","3","4","5"], certa:1, dica:"ja-ne-la = 3." },
+      { palavra:"computador", opcoes:["3","4","5","6"], certa:1, dica:"com-pu-ta-dor = 4." },
+      { palavra:"uva", opcoes:["1","2","3","4"], certa:1, dica:"u-va = 2 sílabas." },
+      { palavra:"abacaxi", opcoes:["2","3","4","5"], certa:2, dica:"a-ba-ca-xi = 4." }
+    ] },
+  /* 2 - CLASSIFICAÇÃO */
+  { tipoFase:"quiz", icone:"🌳", nome:"Floresta das Famílias", titulo:"Ilha 3 — A Floresta das Famílias",
+    narrativa:"Cada árvore abriga uma família de palavras. Descubra a qual cada palavra pertence!",
+    instrucao:"Conte do FIM para o começo. Última = oxítona. Penúltima = paroxítona. Antepenúltima = proparoxítona.",
+    tipo:"classifica",
+    questoes:[
+      { destaque:"ca-FÉ", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:0, dica:"Última (fé) → oxítona." },
+      { destaque:"ca-DEI-ra", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:1, dica:"Penúltima (dei) → paroxítona." },
+      { destaque:"MÉ-di-co", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:2, dica:"Antepenúltima (mé) → proparoxítona." },
+      { destaque:"so-FÁ", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:0, dica:"Última (fá) → oxítona." },
+      { destaque:"XÍ-ca-ra", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:2, dica:"Antepenúltima (xí) → proparoxítona." },
+      { destaque:"ja-NE-la", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:1, dica:"Penúltima (ne) → paroxítona." },
+      { destaque:"a-ba-ca-XI", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:0, dica:"Última (xi) → oxítona." },
+      { destaque:"LÂM-pa-da", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:2, dica:"Antepenúltima (lâm) → proparoxítona." },
+      { destaque:"ca-VA-lo", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:1, dica:"Penúltima (va) → paroxítona." },
+      { destaque:"u-ru-BU", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:0, dica:"Última (bu) → oxítona." }
+    ] },
+
+  /* 3 - BÔNUS: CAÇA-PALAVRAS */
+  { tipoFase:"cacapalavras", icone:"🔍", nome:"Bônus: Caça-Palavras", titulo:"⭐ Fase Bônus — O Caça-Palavras Secreto",
+    narrativa:"O baú do tesouro só abre quando você encontrar todas as palavras acentuadas escondidas na grade!",
+    instrucao:"Clique na primeira e depois na última letra de cada palavra da lista (na horizontal ou vertical). Ache todas para vencer!",
+    palavras:["CAFE","SOFA","LAPIS","HEROI","AVIAO"] },
+
+  /* 4 - ACENTO SIM/NÃO */
+  { tipoFase:"quiz", icone:"🏴‍☠️", nome:"Caverna do Acento Perdido", titulo:"Ilha 4 — A Caverna do Acento Perdido",
+    narrativa:"Piratas escondem acentos nesta caverna! Escolha sempre a palavra escrita do jeito CERTO.",
+    instrucao:"A palavra precisa de acento ou não? Clique na grafia correta.",
+    tipo:"acento",
+    questoes:[
+      { pergunta:"Qual está correta?", opcoes:["voce","você"], certa:1, dica:"'Você': oxítona em -ê, circunflexo." },
+      { pergunta:"Qual está correta?", opcoes:["lapis","lápis"], certa:1, dica:"'Lápis': paroxítona em -is, acentuada." },
+      { pergunta:"Qual está correta?", opcoes:["amigo","amígo"], certa:0, dica:"'Amigo': paroxítona em -o, sem acento." },
+      { pergunta:"Qual está correta?", opcoes:["pássaro","passaro"], certa:0, dica:"'Pássaro': proparoxítona, sempre acentuada." },
+      { pergunta:"Qual está correta?", opcoes:["sofa","sofá"], certa:1, dica:"'Sofá': oxítona em -a, agudo." },
+      { pergunta:"Qual está correta?", opcoes:["arvore","árvore"], certa:1, dica:"'Árvore': proparoxítona." },
+      { pergunta:"Qual está correta?", opcoes:["bola","bóla"], certa:0, dica:"'Bola': paroxítona em -a, sem acento." },
+      { pergunta:"Qual está correta?", opcoes:["facil","fácil"], certa:1, dica:"'Fácil': paroxítona em -l, acentuada." },
+      { pergunta:"Qual está correta?", opcoes:["jacare","jacaré"], certa:1, dica:"'Jacaré': oxítona em -é." },
+      { pergunta:"Qual está correta?", opcoes:["janela","janéla"], certa:0, dica:"'Janela': paroxítona em -a, sem acento." }
+    ] },
+
+  /* 5 - BÔNUS: JOGO DA MEMÓRIA */
+  { tipoFase:"memoria", icone:"🧠", nome:"Bônus: Jogo da Memória", titulo:"⭐ Fase Bônus — Memória das Famílias",
+    narrativa:"Os duendes embaralharam cartas! Encontre os pares: cada palavra com a sua classificação.",
+    instrucao:"Vire duas cartas por vez. Junte cada palavra à família certa (oxítona, paroxítona ou proparoxítona).",
+    pares:[
+      { a:"café", b:"oxítona" },
+      { a:"médico", b:"proparoxítona" },
+      { a:"cadeira", b:"paroxítona" },
+      { a:"sofá", b:"oxítona ²" }
+    ] },
+
+  /* 6 - TIPO DE ACENTO */
+  { tipoFase:"quiz", icone:"🌉", nome:"Ponte dos Acentos", titulo:"Ilha 5 — A Ponte dos Acentos",
+    narrativa:"Para cruzar a ponte, saiba QUAL acento cada palavra usa: agudo (´) ou circunflexo (^).",
+    instrucao:"Agudo (´) = som aberto (á,é,ó). Circunflexo (^) = som fechado (â,ê,ô). Escolha o certo!",
+    tipo:"acento",
+    questoes:[
+      { pergunta:"Como se escreve o HOMEM (pai do pai)?", opcoes:["avô","avó"], certa:0, dica:"'Avô' com circunflexo." },
+      { pergunta:"Qual está correta?", opcoes:["herói","heroi"], certa:0, dica:"'Herói': agudo no ó." },
+      { pergunta:"O número 3 é...", opcoes:["três","trés"], certa:0, dica:"'Três': circunflexo." },
+      { pergunta:"Qual está correta?", opcoes:["chapéu","chapêu"], certa:0, dica:"'Chapéu': agudo, som aberto." },
+      { pergunta:"Qual está correta?", opcoes:["você","vocé"], certa:0, dica:"'Você': circunflexo." },
+      { pergunta:"Qual está correta?", opcoes:["pé","pê"], certa:0, dica:"'Pé': agudo, som aberto." },
+      { pergunta:"Qual está correta?", opcoes:["bebê","bebé"], certa:0, dica:"No Brasil: 'bebê', circunflexo." },
+      { pergunta:"Qual está correta?", opcoes:["café","cafê"], certa:0, dica:"'Café': agudo, som aberto." },
+      { pergunta:"Qual está correta?", opcoes:["vovô","vovó (homem)"], certa:0, dica:"O homem é 'vovô', circunflexo." },
+      { pergunta:"Qual está correta?", opcoes:["mês","mes"], certa:0, dica:"'Mês': circunflexo, som fechado." }
+    ] },
+
+  /* 7 - REGRAS */
+  { tipoFase:"quiz", icone:"🏰", nome:"Castelo das Regras", titulo:"Ilha 6 — O Castelo das Regras",
+    narrativa:"O sábio rei só abre os portões para quem entende POR QUE as palavras levam acento.",
+    instrucao:"Toda proparoxítona é acentuada; oxítonas em a,e,o (±s) também; paroxítonas só em casos especiais.",
+    tipo:"regra",
+    questoes:[
+      { palavra:"Por que 'pássaro' tem acento?", opcoes:["É proparoxítona","É oxítona","Não tem regra"], certa:0, dica:"Toda proparoxítona é acentuada." },
+      { palavra:"Por que 'café' tem acento?", opcoes:["Oxítona em -é","Paroxítona","Proparoxítona"], certa:0, dica:"Oxítonas em a,e,o (±s)." },
+      { palavra:"Por que 'fácil' tem acento?", opcoes:["Paroxítona em -l","Oxítona","Proparoxítona"], certa:0, dica:"Paroxítona em -l." },
+      { palavra:"Por que 'amigo' NÃO tem acento?", opcoes:["Paroxítona em -o","É oxítona","É proparoxítona"], certa:0, dica:"Paroxítonas em a,e,o não acentuam." },
+      { palavra:"Por que 'José' tem acento?", opcoes:["Oxítona em -é","Proparoxítona","Paroxítona"], certa:0, dica:"Oxítona em -e tônico." },
+      { palavra:"Por que 'médico' tem acento?", opcoes:["É proparoxítona","É oxítona","Não tem regra"], certa:0, dica:"Proparoxítona sempre acentua." },
+      { palavra:"Por que 'jardim' NÃO tem acento?", opcoes:["Oxítona em -im","É proparoxítona","Termina em -a"], certa:0, dica:"Oxítonas em -i,-u,-im não acentuam." },
+      { palavra:"Por que 'túnel' tem acento?", opcoes:["Paroxítona em -l","É oxítona","É proparoxítona"], certa:0, dica:"Paroxítona em -l: TÚ-nel." },
+      { palavra:"Por que 'lâmpada' tem acento?", opcoes:["É proparoxítona","É oxítona","Termina em -a"], certa:0, dica:"Proparoxítona acentua sempre." },
+      { palavra:"Por que 'parabéns' tem acento?", opcoes:["Oxítona em -ens","Paroxítona","Proparoxítona"], certa:0, dica:"Oxítona terminada em -ens." }
+    ] },
+
+  /* 8 - BÔNUS: QUEBRA-CABEÇA */
+  { tipoFase:"quebracabeca", icone:"🧩", nome:"Bônus: Quebra-Cabeça", titulo:"⭐ Fase Bônus — Monte a Palavra",
+    narrativa:"O vento espalhou as sílabas! Junte os pedaços na ordem certa para reconstruir cada palavra.",
+    instrucao:"Clique nas sílabas embaralhadas na ORDEM correta para formar a palavra. Use o botão Limpar se errar.",
+    palavras:[
+      { resp:"borboleta", silabas:["bor","bo","le","ta"] },
+      { resp:"caderno", silabas:["ca","der","no"] },
+      { resp:"abacaxi", silabas:["a","ba","ca","xi"] },
+      { resp:"telefone", silabas:["te","le","fo","ne"] }
+    ] },
+
+  /* 9 - ORTOGRAFIA */
+  { tipoFase:"quiz", icone:"🧜", nome:"Lago das Palavras Mágicas", titulo:"Ilha 7 — O Lago das Palavras Mágicas",
+    narrativa:"A sereia do lago só liberta quem escreve as palavras certinhas!",
+    instrucao:"Escolha sempre a forma escrita corretamente.",
+    tipo:"acento",
+    questoes:[
+      { pergunta:"Qual está correta?", opcoes:["ônibus","onibus"], certa:0, dica:"'Ônibus': proparoxítona." },
+      { pergunta:"Qual está correta?", opcoes:["lápis","lapis"], certa:0, dica:"'Lápis': paroxítona em -is." },
+      { pergunta:"Qual está correta?", opcoes:["historia","história"], certa:1, dica:"'História': acento no ó." },
+      { pergunta:"Qual está correta?", opcoes:["médico","medico"], certa:0, dica:"'Médico': proparoxítona." },
+      { pergunta:"Qual está correta?", opcoes:["familia","família"], certa:1, dica:"'Família': acento no í." },
+      { pergunta:"Qual está correta?", opcoes:["rapido","rápido"], certa:1, dica:"'Rápido': proparoxítona." },
+      { pergunta:"Qual está correta?", opcoes:["agua","água"], certa:1, dica:"'Água': paroxítona acentuada." },
+      { pergunta:"Qual está correta?", opcoes:["secretária","secretaria"], certa:0, dica:"A pessoa 'secretária'." },
+      { pergunta:"Qual está correta?", opcoes:["pé","pe"], certa:0, dica:"'Pé' do corpo leva acento." },
+      { pergunta:"Qual está correta?", opcoes:["sábado","sabado"], certa:0, dica:"'Sábado': proparoxítona." }
+    ] },
+
+  /* 10 - BÔNUS: VERDADEIRO OU FALSO RELÂMPAGO */
+  { tipoFase:"verdadeirofalso", icone:"⚡", nome:"Bônus: Relâmpago V ou F", titulo:"⭐ Fase Bônus — Relâmpago Verdadeiro ou Falso",
+    narrativa:"Um raio de sabedoria! Responda rápido: a afirmação está certa ou errada?",
+    instrucao:"Leia cada frase e decida se é VERDADEIRA ou FALSA. Pense na regra!",
+    afirmacoes:[
+      { frase:"Toda proparoxítona é acentuada.", v:true, dica:"Verdade! Proparoxítona sempre tem acento." },
+      { frase:"A palavra 'café' é paroxítona.", v:false, dica:"Falso! 'Café' é oxítona (ca-FÉ)." },
+      { frase:"A sílaba tônica é a mais fraca da palavra.", v:false, dica:"Falso! É a mais FORTE." },
+      { frase:"'Médico' tem 3 sílabas.", v:true, dica:"Verdade! mé-di-co = 3 sílabas." },
+      { frase:"'Amigo' precisa de acento.", v:false, dica:"Falso! Paroxítona em -o não acentua." },
+      { frase:"O acento circunflexo deixa o som fechado.", v:true, dica:"Verdade! â, ê, ô são fechados." },
+      { frase:"'Sofá' é uma palavra oxítona.", v:true, dica:"Verdade! so-FÁ, força na última." },
+      { frase:"Palavra de uma sílaba chama-se trissílaba.", v:false, dica:"Falso! É monossílaba." }
+    ] },
+
+  /* 11 - DESAFIO FINAL */
+  { tipoFase:"quiz", icone:"👑", nome:"Torre Final do Tesouro", titulo:"Ilha 8 — A Torre Final do Tesouro",
+    narrativa:"A última prova! Um misturão de TUDO. Vença e devolva todos os acentos ao reino!",
+    instrucao:"Perguntas de todos os tipos. Mostre que virou um Mestre das Sílabas!",
+    tipo:"misto",
+    questoes:[
+      { tipoQ:"tonica", silabasReais:["bor","bo","le","ta"], certa:2, pergunta:"Clique na sílaba tônica:", dica:"bor-bo-LE-ta." },
+      { tipoQ:"classifica", destaque:"LÂM-pa-da", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:2, dica:"Antepenúltima → proparoxítona." },
+      { tipoQ:"acento", pergunta:"Qual está correta?", opcoes:["parabéns","parabens"], certa:0, dica:"'Parabéns': oxítona em -ens." },
+      { tipoQ:"regra", palavra:"Por que 'médico' tem acento?", opcoes:["É proparoxítona","É oxítona","Não tem regra"], certa:0, dica:"Proparoxítona." },
+      { tipoQ:"classifica", destaque:"pa-ra-BÉNS", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:0, dica:"Última → oxítona." },
+      { tipoQ:"contar", palavra:"chocolate", opcoes:["2","3","4","5"], certa:2, dica:"cho-co-la-te = 4." },
+      { tipoQ:"tonica", silabasReais:["te","le","fo","ne"], certa:2, pergunta:"Clique na sílaba tônica:", dica:"te-le-FO-ne." },
+      { tipoQ:"acento", pergunta:"Qual está correta?", opcoes:["coração","coracao"], certa:0, dica:"'Coração': oxítona em -ão." },
+      { tipoQ:"classifica", destaque:"a-RA-ra", opcoes:["Oxítona","Paroxítona","Proparoxítona"], certa:1, dica:"a-RA-ra: força na penúltima → paroxítona." },
+      { tipoQ:"acento", pergunta:"Qual está correta?", opcoes:["número","numero"], certa:0, dica:"'Número': proparoxítona." }
+    ] }
+];
+
+var NUM_FASES = FASES.length;
+
+/* Intervalos da Coruja (aparecem ENTRE as fases) */
+var INTERVALOS = [
+  { incentivo:"Você está indo muito bem! Respire fundo, beba um gole de água e vamos em frente.",
+    curiosidade:"🦉 Sabia que TODA palavra tem uma sílaba tônica? É ela que dá o 'ritmo' quando falamos!" },
+  { incentivo:"Que explorador corajoso! As palavras já estão mais felizes com você por perto.",
+    curiosidade:"📚 As proparoxítonas são as únicas que SEMPRE levam acento. Ex.: médico, lâmpada, sábado." },
+  { incentivo:"Continue assim! Cada acento que você acerta volta para o seu lugar no reino.",
+    curiosidade:"✨ O nome 'tônica' vem de 'tom'. A sílaba tônica é a que falamos num tom mais forte!" },
+  { incentivo:"Você é cada vez mais sábio. A Coruja Letra está orgulhosa!",
+    curiosidade:"🔤 Em português usamos três acentos: agudo (´), circunflexo (^) e o til (~), como em 'pão'." },
+  { incentivo:"Falta pouco para a grande torre! Mantenha o foco, explorador.",
+    curiosidade:"🎯 Palavras de uma sílaba (sol, pé, mar) são as monossílabas. As de muitas, polissílabas!" },
+  { incentivo:"Quase lá! O reino inteiro torce por você.",
+    curiosidade:"🏆 Ler em voz alta ajuda a descobrir a sílaba tônica de qualquer palavra. Experimente!" }
+];
+
+/* ---------------- ESTADO ---------------- */
+var faseAtual=0, questaoAtual=0, pontos=0, vidas=3, respondeu=false, nomeJogador="Explorador";
+var acertosPorFase=[], totalPorFase=[], faseConcluida=[];
+var intervaloIndice=0, proximaAcaoAposIntervalo=null;
+for (var i=0;i<NUM_FASES;i++){ acertosPorFase.push(0); totalPorFase.push(0); faseConcluida.push(false); }
+
+function $(id){ return document.getElementById(id); }
+function getSilabas(q){ return q.silabasReais; }
+function embaralhar(arr){ for (var i=arr.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=arr[i]; arr[i]=arr[j]; arr[j]=t; } return arr; }
+
+function totalAcertosGeral(){
+  var s=0; for (var i=0;i<NUM_FASES;i++){ s+=acertosPorFase[i]; } return s;
+}
+function atualizarPlacar(){
+  $("pontos").textContent=pontos;
+  $("nome-jogador").textContent=nomeJogador;
+  $("fase-total").textContent=NUM_FASES;
+  $("vidas").textContent="⭐ "+totalAcertosGeral()+" acertos";
+  $("fase-num").textContent=faseAtual;
+}
+
+/* esconder todas as seções de jogo */
+function esconderTudo(){
+  $("tela-inicio").classList.add("escondido");
+  $("tela-mapa").classList.add("escondido");
+  $("area-jogo").classList.add("escondido");
+  $("area-bonus").classList.add("escondido");
+  $("tela-transicao").classList.remove("ativa");
+  $("tela-intervalo").classList.remove("ativa");
+  $("relatorio").classList.remove("ativo");
+}
+
+/* ---------------- MAPA ---------------- */
+function mostrarMapa(){
+  esconderTudo();
+  $("tela-mapa").classList.remove("escondido");
+  var t=$("trilha-mapa"); t.innerHTML="";
+  for (var i=0;i<NUM_FASES;i++){
+    var fase=FASES[i], ehBonus=(fase.tipoFase!=="quiz");
+    var cls="ilha"+(ehBonus?" bonus-ilha":""), status="🔒";
+    if (faseConcluida[i]){ status="✅"; }
+    else if (i===faseAtual){ cls+=" atual"; status="📍"; }
+    else if (i<faseAtual){ status="✅"; }
+    else { cls+=" bloqueada"; }
+    var ilha=document.createElement("div");
+    ilha.className=cls;
+    ilha.innerHTML='<div class="icone">'+fase.icone+'</div>'+
+      '<div class="info"><b>'+fase.nome+'</b><br><small>'+resumoTipo(fase)+'</small></div>'+
+      '<div class="status">'+status+'</div>';
+    t.appendChild(ilha);
+    if (i<NUM_FASES-1){ var con=document.createElement("div"); con.className="conector"; con.textContent="┃"; t.appendChild(con); }
+  }
+  $("btn-embarcar").textContent = (faseAtual>=NUM_FASES) ? "🏁 Ver relatório final" :
+    (FASES[faseAtual].tipoFase==="quiz" ? "⛵ Embarcar para a ilha" : "🎁 Entrar na fase bônus");
+}
+function resumoTipo(f){
+  if (f.tipoFase==="cacapalavras") return "Caça-palavras • bônus";
+  if (f.tipoFase==="memoria") return "Jogo da memória • bônus";
+  if (f.tipoFase==="quebracabeca") return "Quebra-cabeça • bônus";
+  if (f.tipoFase==="verdadeirofalso") return "Verdadeiro ou Falso • bônus";
+  if (f.tipo==="tonica") return "Ache a sílaba tônica • 10 desafios";
+  if (f.tipo==="contar") return "Conte as sílabas • 10 desafios";
+  if (f.tipo==="classifica") return "Classifique • 10 desafios";
+  if (f.tipo==="acento") return "Acerte a grafia • 10 desafios";
+  if (f.tipo==="regra") return "Explique a regra • 10 desafios";
+  return "Desafio misturado • 10 desafios";
+}
+
+function embarcar(){
+  if (faseAtual>=NUM_FASES){ finalizar(false); return; }
+  var fase=FASES[faseAtual];
+  if (fase.tipoFase==="quiz") iniciarFaseQuiz();
+  else iniciarFaseBonus();
+}
+
+/* ---------------- FASE QUIZ ---------------- */
+function iniciarFaseQuiz(){
+  questaoAtual=0;
+  totalPorFase[faseAtual]=FASES[faseAtual].questoes.length;
+  esconderTudo();
+  $("area-jogo").classList.remove("escondido");
+  atualizarPlacar(); mostrarQuestao();
+}
+function montarProgresso(){
+  var p=$("progresso-fase"); p.innerHTML="";
+  var n=FASES[faseAtual].questoes.length;
+  for (var i=0;i<n;i++){
+    var d=document.createElement("div");
+    d.className=(i===questaoAtual)?"ponto-q atual":"ponto-q"; d.id="pq-"+i;
+    p.appendChild(d);
+  }
+}
+function mostrarQuestao(){
+  respondeu=false;
+  var fase=FASES[faseAtual], q=fase.questoes[questaoAtual];
+  $("fase-tag").textContent=fase.titulo.split("—")[0].trim()+" • "+(questaoAtual+1)+"/"+fase.questoes.length;
+  $("fase-titulo").textContent=fase.titulo;
+  $("fase-narrativa").innerHTML="🦉 "+fase.narrativa;
+  $("fase-instrucao").textContent=fase.instrucao;
+  $("feedback").textContent=""; $("feedback").className="feedback";
+  $("dica").className="dica"; $("dica").textContent="💡 Dica: "+q.dica;
+  $("btn-proximo").disabled=true;
+  $("opcoes-area").innerHTML=""; $("palavra-area").innerHTML="";
+  montarProgresso();
+  var tipo = q.tipoQ ? q.tipoQ : fase.tipo;
+  if (tipo==="tonica") montarTonica(q);
+  else if (tipo==="contar") montarContar(q);
+  else if (tipo==="classifica") montarClassifica(q);
+  else if (tipo==="acento") montarAcento(q);
+  else if (tipo==="regra") montarRegra(q);
+}
+function montarTonica(q){
+  $("pergunta-texto").innerHTML = q.pergunta ? q.pergunta : "Clique na sílaba que falamos mais FORTE:";
+  var pal=$("palavra-area"); var labels=getSilabas(q);
+  for (var i=0;i<labels.length;i++){
+    (function(idx){
+      var sp=document.createElement("span");
+      sp.className="silaba"; sp.textContent=labels[idx];
+      sp.setAttribute("role","button"); sp.setAttribute("tabindex","0");
+      sp.onclick=function(){ responderTonica(idx,q,sp); };
+      sp.onkeydown=function(e){ if(e.keyCode===13||e.keyCode===32){ e.preventDefault(); responderTonica(idx,q,sp);} };
+      pal.appendChild(sp);
+      if (idx<labels.length-1){ var tr=document.createElement("span"); tr.textContent=" - "; pal.appendChild(tr); }
+    })(i);
+  }
+}
+function responderTonica(idx,q,el){
+  if (respondeu) return; respondeu=true;
+  var todas=$("palavra-area").getElementsByClassName("silaba");
+  if (idx===q.certa){ el.className="silaba escolhida-certa"; acertarQuiz(); }
+  else { el.className="silaba escolhida-erro"; if(todas[q.certa]) todas[q.certa].className="silaba escolhida-certa"; errarQuiz(); }
+}
+function montarContar(q){ $("pergunta-texto").innerHTML="Quantas sílabas tem esta palavra?"; $("palavra-area").innerHTML=q.palavra; criarBotoes(q.opcoes,q.certa); }
+function montarClassifica(q){ $("pergunta-texto").innerHTML="Como classificamos esta palavra?"; $("palavra-area").innerHTML=q.destaque?q.destaque:q.palavra; criarBotoes(q.opcoes,q.certa); }
+function montarAcento(q){ $("pergunta-texto").innerHTML=q.pergunta; $("palavra-area").innerHTML="✏️"; criarBotoes(q.opcoes,q.certa); }
+function montarRegra(q){ $("pergunta-texto").innerHTML="🤔 Responda ao rei:"; $("palavra-area").innerHTML='<span style="font-size:0.6em;">'+q.palavra+'</span>'; criarBotoes(q.opcoes,q.certa); }
+function criarBotoes(opcoes,certa){
+  var opc=$("opcoes-area"); opc.innerHTML="";
+  for (var i=0;i<opcoes.length;i++){
+    (function(idx){
+      var b=document.createElement("button");
+      b.className="opcao"; b.textContent=opcoes[idx];
+      b.onclick=function(){ responderOpcao(idx,certa); };
+      opc.appendChild(b);
+    })(i);
+  }
+}
+function responderOpcao(idx,certa){
+  if (respondeu) return; respondeu=true;
+  var botoes=$("opcoes-area").getElementsByClassName("opcao");
+  for (var i=0;i<botoes.length;i++){ botoes[i].disabled=true; }
+  if (idx===certa){ botoes[idx].className="opcao certa"; acertarQuiz(); }
+  else { botoes[idx].className="opcao errada"; if(botoes[certa]) botoes[certa].className="opcao certa"; errarQuiz(); }
+}
+function acertarQuiz(){
+  pontos+=10; acertosPorFase[faseAtual]++;
+  var pq=$("pq-"+questaoAtual); if(pq) pq.className="ponto-q ok";
+  var el=["✅ Mandou bem! +10","✅ Isso mesmo! +10","✅ Perfeito! +10","✅ Show! +10","✅ Você arrasou! +10"];
+  var fb=$("feedback"); fb.textContent=el[Math.floor(Math.random()*el.length)]; fb.className="feedback ok";
+  atualizarPlacar(); $("btn-proximo").disabled=false;
+}
+function errarQuiz(){
+  var pq=$("pq-"+questaoAtual); if(pq) pq.className="ponto-q no";
+  var fb=$("feedback"); fb.textContent="🙂 Quase! Veja a resposta certa em verde e siga em frente."; fb.className="feedback nao";
+  $("dica").className="dica mostrar";
+  atualizarPlacar(); $("btn-proximo").disabled=false;
+}
+function proximoQuiz(){
+  questaoAtual++;
+  if (questaoAtual>=FASES[faseAtual].questoes.length){ faseConcluida[faseAtual]=true; mostrarTransicao(); return; }
+  mostrarQuestao();
+}
+
+/* ---------------- FASES BÔNUS ---------------- */
+function iniciarFaseBonus(){
+  esconderTudo();
+  totalPorFase[faseAtual]=0; acertosPorFase[faseAtual]=0;
+  var fase=FASES[faseAtual];
+  $("bonus-tag").textContent="⭐ Fase Bônus";
+  $("bonus-titulo").textContent=fase.titulo;
+  $("bonus-narrativa").innerHTML="🦉 "+fase.narrativa;
+  $("bonus-instrucao").textContent=fase.instrucao;
+  $("bonus-feedback").textContent=""; $("bonus-feedback").className="feedback";
+  $("bonus-conteudo").innerHTML="";
+  $("btn-bonus-fim").disabled=true;
+  $("area-bonus").classList.remove("escondido");
+  atualizarPlacar();
+  if (fase.tipoFase==="cacapalavras") montarCacaPalavras(fase);
+  else if (fase.tipoFase==="memoria") montarMemoria(fase);
+  else if (fase.tipoFase==="quebracabeca") montarQuebraCabeca(fase);
+  else if (fase.tipoFase==="verdadeirofalso") montarVerdadeiroFalso(fase);
+}
+function concluirBonus(acertos, total){
+  acertosPorFase[faseAtual]=acertos;
+  totalPorFase[faseAtual]=total;
+  faseConcluida[faseAtual]=true;
+  pontos += acertos*10;
+  atualizarPlacar();
+  $("btn-bonus-fim").disabled=false;
+}
+
+/* ===== CAÇA-PALAVRAS ===== */
+var cpEstado=null;
+function montarCacaPalavras(fase){
+  var palavras=fase.palavras.slice();
+  var N=10;
+  var grade=[]; var i,j;
+  for (i=0;i<N;i++){ grade.push([]); for (j=0;j<N;j++){ grade[i].push(""); } }
+  var posicoes={};
+  // colocar palavras (horizontal ou vertical)
+  for (var p=0;p<palavras.length;p++){
+    var palavra=palavras[p]; var colocada=false; var tent=0;
+    while(!colocada && tent<200){
+      tent++;
+      var horiz=Math.random()<0.5;
+      var lin=Math.floor(Math.random()*N), col=Math.floor(Math.random()*N);
+      if (horiz && col+palavra.length<=N){
+        var ok=true;
+        for (var k=0;k<palavra.length;k++){ var c=grade[lin][col+k]; if(c!=="" && c!==palavra.charAt(k)){ ok=false; break; } }
+        if (ok){ for (var k2=0;k2<palavra.length;k2++){ grade[lin][col+k2]=palavra.charAt(k2); }
+          posicoes[palavra]={lin:lin,col:col,horiz:true,len:palavra.length}; colocada=true; }
+      } else if (!horiz && lin+palavra.length<=N){
+        var ok2=true;
+        for (var k3=0;k3<palavra.length;k3++){ var c2=grade[lin+k3][col]; if(c2!=="" && c2!==palavra.charAt(k3)){ ok2=false; break; } }
+        if (ok2){ for (var k4=0;k4<palavra.length;k4++){ grade[lin+k4][col]=palavra.charAt(k4); }
+          posicoes[palavra]={lin:lin,col:col,horiz:false,len:palavra.length}; colocada=true; }
+      }
+    }
+  }
+  var letras="ABCDEFGHIJLMNOPQRSTUVZ";
+  for (i=0;i<N;i++){ for (j=0;j<N;j++){ if(grade[i][j]===""){ grade[i][j]=letras.charAt(Math.floor(Math.random()*letras.length)); } } }
+
+  cpEstado={ grade:grade, N:N, palavras:palavras, posicoes:posicoes, achadas:[], sel:[] };
+
+  var wrap=document.createElement("div"); wrap.className="cp-wrap";
+  var gradeDiv=document.createElement("div"); gradeDiv.className="cp-grade";
+  gradeDiv.style.gridTemplateColumns="repeat("+N+", auto)";
+  for (i=0;i<N;i++){ for (j=0;j<N;j++){
+    (function(li,co){
+      var cel=document.createElement("div"); cel.className="cp-cel"; cel.id="cp-"+li+"-"+co;
+      cel.textContent=grade[li][co];
+      cel.onclick=function(){ cpClique(li,co); };
+      gradeDiv.appendChild(cel);
+    })(i,j);
+  } }
+  var lista=document.createElement("div"); lista.className="cp-lista";
+  lista.innerHTML="<h4>Encontre:</h4>";
+  for (p=0;p<palavras.length;p++){
+    var item=document.createElement("div"); item.className="cp-palavra"; item.id="cpw-"+palavras[p];
+    item.textContent=palavras[p]; lista.appendChild(item);
+  }
+  wrap.appendChild(gradeDiv); wrap.appendChild(lista);
+  $("bonus-conteudo").appendChild(wrap);
+}
+function cpClique(li,co){
+  var s=cpEstado;
+  if (s.sel.length===0){
+    s.sel.push({li:li,co:co}); $("cp-"+li+"-"+co).classList.add("sel");
+  } else {
+    var a=s.sel[0]; var b={li:li,co:co};
+    // verificar se a..b corresponde a alguma palavra
+    var achou=verificarCp(a,b);
+    if (!achou) achou=verificarCp(b,a);
+    // limpar seleção visual
+    $("cp-"+a.li+"-"+a.co).classList.remove("sel");
+    s.sel=[];
+  }
+}
+function verificarCp(a,b){
+  var s=cpEstado;
+  for (var p=0;p<s.palavras.length;p++){
+    var pal=s.palavras[p];
+    if (s.achadas.indexOf(pal)>=0) continue;
+    var pos=s.posicoes[pal]; if(!pos) continue;
+    var fimLin=pos.horiz?pos.lin:(pos.lin+pos.len-1);
+    var fimCol=pos.horiz?(pos.col+pos.len-1):pos.col;
+    if (a.li===pos.lin && a.co===pos.col && b.li===fimLin && b.co===fimCol){
+      // marcar células
+      for (var k=0;k<pos.len;k++){
+        var cl=pos.horiz?pos.lin:(pos.lin+k);
+        var cc=pos.horiz?(pos.col+k):pos.col;
+        $("cp-"+cl+"-"+cc).className="cp-cel achou";
+      }
+      $("cpw-"+pal).className="cp-palavra ok";
+      s.achadas.push(pal);
+      $("bonus-feedback").textContent="✅ Achou: "+pal+"!"; $("bonus-feedback").className="feedback ok";
+      if (s.achadas.length===s.palavras.length){
+        $("bonus-feedback").textContent="🎉 Você encontrou todas as palavras! Tesouro liberado!";
+        concluirBonus(s.palavras.length, s.palavras.length);
+      } else {
+        // crédito parcial vai no final; aqui só conta no fim
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+/* ===== JOGO DA MEMÓRIA ===== */
+var memEstado=null;
+function montarMemoria(fase){
+  var cartas=[];
+  for (var i=0;i<fase.pares.length;i++){
+    cartas.push({ id:i, texto:fase.pares[i].a });
+    cartas.push({ id:i, texto:fase.pares[i].b });
+  }
+  embaralhar(cartas);
+  memEstado={ cartas:cartas, viradas:[], pares:0, total:fase.pares.length, travado:false };
+  var grade=document.createElement("div"); grade.className="mem-grade";
+  for (var c=0;c<cartas.length;c++){
+    (function(idx){
+      var carta=document.createElement("div"); carta.className="mem-carta"; carta.id="mem-"+idx;
+      carta.innerHTML='<span class="verso">❓</span><span class="frente">'+cartas[idx].texto+'</span>';
+      carta.onclick=function(){ memClique(idx); };
+      grade.appendChild(carta);
+    })(c);
+  }
+  $("bonus-conteudo").appendChild(grade);
+}
+function memClique(idx){
+  var s=memEstado;
+  if (s.travado) return;
+  var el=$("mem-"+idx);
+  if (el.className.indexOf("par")>=0 || el.className.indexOf("virada")>=0) return;
+  el.className="mem-carta virada";
+  s.viradas.push(idx);
+  if (s.viradas.length===2){
+    s.travado=true;
+    var a=s.viradas[0], b=s.viradas[1];
+    if (s.cartas[a].id===s.cartas[b].id){
+      setTimeout(function(){
+        $("mem-"+a).className="mem-carta par"; $("mem-"+b).className="mem-carta par";
+        s.viradas=[]; s.travado=false; s.pares++;
+        $("bonus-feedback").textContent="✅ Par encontrado!"; $("bonus-feedback").className="feedback ok";
+        if (s.pares===s.total){
+          $("bonus-feedback").textContent="🎉 Todos os pares! Memória de explorador!";
+          concluirBonus(s.total, s.total);
+        }
+      },500);
+    } else {
+      setTimeout(function(){
+        $("mem-"+a).className="mem-carta"; $("mem-"+b).className="mem-carta";
+        s.viradas=[]; s.travado=false;
+        $("bonus-feedback").textContent="❌ Não é par. Tente lembrar!"; $("bonus-feedback").className="feedback nao";
+      },800);
+    }
+  }
+}
+
+/* ===== QUEBRA-CABEÇA ===== */
+var qcEstado=null;
+function montarQuebraCabeca(fase){
+  qcEstado={ palavras:fase.palavras, idx:0, montado:[], acertos:0 };
+  renderQc();
+}
+function renderQc(){
+  var s=qcEstado;
+  var fase=FASES[faseAtual];
+  var item=s.palavras[s.idx];
+  var cont=$("bonus-conteudo"); cont.innerHTML="";
+  var titulo=document.createElement("div"); titulo.className="pergunta";
+  titulo.innerHTML="Palavra "+(s.idx+1)+" de "+s.palavras.length+" — monte na ordem certa:";
+  cont.appendChild(titulo);
+
+  var alvo=document.createElement("div"); alvo.className="qc-alvo"; alvo.id="qc-alvo";
+  if (s.montado.length===0){ alvo.innerHTML='<span style="color:#aaa;">clique nas sílabas abaixo...</span>'; }
+  cont.appendChild(alvo);
+
+  var banco=document.createElement("div"); banco.className="qc-banco";
+  var emb=item.silabas.slice(); embaralhar(emb);
+  s.embaralhadas=emb;
+  for (var i=0;i<emb.length;i++){
+    (function(idx){
+      var peca=document.createElement("div"); peca.className="qc-peca"; peca.id="qc-peca-"+idx;
+      peca.textContent=emb[idx];
+      peca.onclick=function(){ qcAddSilaba(idx); };
+      banco.appendChild(peca);
+    })(i);
+  }
+  cont.appendChild(banco);
+
+  var botoes=document.createElement("div"); botoes.style.textAlign="center";
+  var limpar=document.createElement("button"); limpar.className="opcao"; limpar.style.maxWidth="160px";
+  limpar.textContent="🧹 Limpar"; limpar.onclick=function(){ s.montado=[]; renderQcMantendo(); };
+  botoes.appendChild(limpar);
+  cont.appendChild(botoes);
+}
+function renderQcMantendo(){
+  // re-renderiza preservando a palavra atual (recomeça as peças)
+  renderQc();
+}
+function qcAddSilaba(idxPeca){
+  var s=qcEstado;
+  var peca=$("qc-peca-"+idxPeca);
+  if (peca.className.indexOf("usada")>=0) return;
+  peca.className="qc-peca usada";
+  s.montado.push({ texto:s.embaralhadas[idxPeca], idx:idxPeca });
+  var alvo=$("qc-alvo"); 
+  var txt=""; for (var i=0;i<s.montado.length;i++){ txt+= (i>0?"·":"")+s.montado[i].texto; }
+  alvo.innerHTML='<span class="qc-slot">'+txt+'</span>';
+  // verificar se completou
+  var item=s.palavras[s.idx];
+  if (s.montado.length===item.silabas.length){
+    var formada=""; for (var j=0;j<s.montado.length;j++){ formada+=s.montado[j].texto; }
+    if (formada===item.resp){
+      s.acertos++;
+      $("bonus-feedback").textContent="✅ Isso! Você montou '"+item.resp+"'."; $("bonus-feedback").className="feedback ok";
+      avancarQc();
+    } else {
+      $("bonus-feedback").textContent="❌ Ops! Ficou '"+formada+"'. Clique em Limpar e tente de novo."; $("bonus-feedback").className="feedback nao";
+    }
+  }
+}
+function avancarQc(){
+  var s=qcEstado;
+  s.idx++;
+  s.montado=[];
+  if (s.idx>=s.palavras.length){
+    $("bonus-feedback").textContent="🎉 Você montou todas as palavras! Quebra-cabeça resolvido!";
+    concluirBonus(s.acertos, s.palavras.length);
+    $("bonus-conteudo").innerHTML='<div class="pergunta" style="font-size:1.3em;">🧩 Todas as palavras montadas: '+s.acertos+'/'+s.palavras.length+'</div>';
+  } else {
+    setTimeout(renderQc, 700);
+  }
+}
+
+/* ===== VERDADEIRO OU FALSO ===== */
+var vfEstado=null;
+function montarVerdadeiroFalso(fase){
+  vfEstado={ lista:fase.afirmacoes, idx:0, acertos:0 };
+  renderVf();
+}
+function renderVf(){
+  var s=vfEstado;
+  if (s.idx>=s.lista.length){
+    $("bonus-conteudo").innerHTML='<div class="pergunta" style="font-size:1.2em;">⚡ Fim do relâmpago! Acertos: '+s.acertos+'/'+s.lista.length+'</div>';
+    $("bonus-feedback").textContent="🎉 Bônus concluído!";
+    concluirBonus(s.acertos, s.lista.length);
+    return;
+  }
+  var item=s.lista[s.idx];
+  var cont=$("bonus-conteudo"); cont.innerHTML="";
+  var prog=document.createElement("div"); prog.className="pergunta";
+  prog.textContent="Frase "+(s.idx+1)+" de "+s.lista.length;
+  cont.appendChild(prog);
+  var frase=document.createElement("div"); frase.className="vf-frase";
+  frase.textContent='"'+item.frase+'"'; cont.appendChild(frase);
+  var opc=document.createElement("div"); opc.className="opcoes";
+  var bV=document.createElement("button"); bV.className="opcao"; bV.textContent="✔️ Verdadeiro";
+  var bF=document.createElement("button"); bF.className="opcao"; bF.textContent="❌ Falso";
+  bV.onclick=function(){ responderVf(true,bV,bF); };
+  bF.onclick=function(){ responderVf(false,bV,bF); };
+  opc.appendChild(bV); opc.appendChild(bF); cont.appendChild(opc);
+}
+function responderVf(resp,bV,bF){
+  var s=vfEstado; var item=s.lista[s.idx];
+  bV.disabled=true; bF.disabled=true;
+  if (resp===item.v){ s.acertos++; (resp?bV:bF).className="opcao certa";
+    $("bonus-feedback").textContent="✅ Correto! "+item.dica; $("bonus-feedback").className="feedback ok"; }
+  else { (resp?bV:bF).className="opcao errada"; (item.v?bV:bF).className="opcao certa";
+    $("bonus-feedback").textContent="❌ "+item.dica; $("bonus-feedback").className="feedback nao"; }
+  s.idx++;
+  setTimeout(renderVf, 1100);
+}
+
+/* ---------------- TRANSIÇÃO + INTERVALO ---------------- */
+function mostrarTransicao(){
+  esconderTudo();
+  var faseConc=faseAtual; /* fase que acabou de ser concluída */
+  var fase=FASES[faseConc], ac=acertosPorFase[faseConc], tt=totalPorFase[faseConc];
+  $("trans-icone").textContent=fase.icone;
+  $("trans-titulo").textContent=fase.nome+" concluída!";
+  $("trans-badge").textContent= (tt>0? ("🏅 "+ac+" de "+tt+" acertos") : "🏅 Bônus concluído!");
+  faseAtual++;
+  var ehFim=(faseAtual>=NUM_FASES);
+  if (ehFim){
+    $("trans-titulo").textContent="Você chegou ao fim da jornada! 🎊";
+    $("trans-badge").textContent="🏆 Todas as etapas concluídas";
+    $("trans-texto").textContent="Hora de ver o seu relatório, "+nomeJogador+"!";
+    $("btn-continuar-mapa").textContent="🏁 Ver relatório final";
+  } else {
+    var msgs=["Excelente trabalho! Vamos à próxima ilha.","Você está cada vez mais forte!","Mais um pedaço do reino salvo!","Os acentos voltam graças a você!"];
+    $("trans-texto").textContent=msgs[Math.floor(Math.random()*msgs.length)];
+    $("btn-continuar-mapa").textContent="⛵ Navegar até a próxima ilha";
+  }
+  montarMarMapa(faseConc, ehFim);
+  $("tela-transicao").classList.add("ativa"); atualizarPlacar();
+}
+
+/* monta o mar com TODAS as ilhas e faz o navio viajar até a próxima */
+function montarMarMapa(faseConc, ehFim){
+  var trilha=$("mar-trilha"); trilha.innerHTML="";
+  /* remove rotas antigas para não acumular */
+  var antigos=$("mar-mapa").getElementsByClassName("mar-pontilhado");
+  while (antigos.length>0){ antigos[0].parentNode.removeChild(antigos[0]); }
+
+  /* linha pontilhada de rota */
+  var rota=document.createElement("div"); rota.className="mar-pontilhado";
+  $("mar-mapa").appendChild(rota);
+
+  /* cria TODAS as ilhas */
+  for (var i=0;i<NUM_FASES;i++){
+    var il=document.createElement("div");
+    il.className="mar-ilhota"+(faseConcluida[i]?" feita":"");
+    if (!ehFim && i===faseConc+1){ il.className+=" destino"; }
+    il.innerHTML=FASES[i].icone+'<span class="lab">'+(faseConcluida[i]?"✅":(i+1))+'</span>';
+    trilha.appendChild(il);
+  }
+
+  /* posiciona o navio na ilha de origem e desliza até o destino */
+  var navio=$("mar-navio");
+  function posPercent(indice){
+    if (NUM_FASES<=1) return 6;
+    return 5 + indice*(88/(NUM_FASES-1)); /* % da largura */
+  }
+  navio.style.transition="none";
+  navio.style.left=posPercent(faseConc)+"%";
+  navio.textContent="⛵";
+  if (!ehFim){
+    setTimeout(function(){
+      navio.style.transition="left 2.2s ease-in-out";
+      navio.style.left=posPercent(faseConc+1)+"%";
+    }, 60);
+  } else {
+    setTimeout(function(){
+      navio.style.transition="left 1.5s ease-in-out";
+      navio.style.left=posPercent(NUM_FASES-1)+"%";
+      navio.textContent="🏁";
+    }, 60);
+  }
+}
+
+/* Depois da transição: mostra a pausa da Coruja (ou o relatório no fim) */
+function aposTransicao(){
+  if (faseAtual>=NUM_FASES){ finalizar(false); return; }
+  mostrarIntervalo();
+}
+function mostrarIntervalo(){
+  esconderTudo();
+  var it=INTERVALOS[intervaloIndice % INTERVALOS.length];
+  intervaloIndice++;
+  var prox=FASES[faseAtual];
+  $("int-titulo").textContent="☕ Pausa da Coruja, "+nomeJogador+"!";
+  $("int-incentivo").textContent=it.incentivo;
+  $("int-curiosidade").innerHTML="<b>Você sabia?</b> "+it.curiosidade;
+  $("btn-fim-intervalo").textContent="➜ Começar: "+prox.nome;
+  $("tela-intervalo").classList.add("ativa");
+}
+
+/* ---------------- RELATÓRIO ---------------- */
+function finalizar(){
+  esconderTudo();
+  $("relatorio").classList.add("ativo");
+  var totalAcertos=0,totalQuestoes=0;
+  var corpo=$("rel-corpo"); corpo.innerHTML="";
+  for (var f=0;f<NUM_FASES;f++){
+    var fase=FASES[f];
+    var ac=acertosPorFase[f];
+    var tt = totalPorFase[f]>0 ? totalPorFase[f] : (fase.tipoFase==="quiz" ? fase.questoes.length : (faseConcluida[f]? contarBonus(fase):0));
+    var jogou=faseConcluida[f]||f===faseAtual||totalPorFase[f]>0;
+    if (fase.tipoFase==="quiz"){ totalAcertos+=ac; totalQuestoes+=tt; }
+    var res= jogou ? (tt>0?avaliar(ac,tt):"🎁 Bônus ok") : "⚪ Não visitada";
+    var rotulo = fase.tipoFase==="quiz" ? "Ilha" : "Bônus";
+    var tr=document.createElement("tr");
+    tr.innerHTML="<td>"+fase.icone+" "+rotulo+"</td><td>"+fase.nome+"</td><td>"+(tt>0?ac+" de "+tt:"—")+"</td><td>"+res+"</td>";
+    corpo.appendChild(tr);
+  }
+  $("rel-total").textContent=totalAcertos+" / "+totalQuestoes+" (ilhas)";
+  $("rel-total-res").textContent=avaliar(totalAcertos,totalQuestoes);
+  var perc=totalQuestoes>0?Math.round((totalAcertos/totalQuestoes)*100):0;
+  setTimeout(function(){ var b=$("barra"); b.style.width=perc+"%"; b.textContent=perc+"%"; },200);
+
+  var selo=$("selo"),frase=$("rel-frase"),titulo=$("rel-titulo"),quem=nomeJogador;
+  if (perc>=90){ selo.textContent="👑"; titulo.textContent=quem+", Mestre das Sílabas!"; frase.textContent="Incrível! Você devolveu todos os acentos ao reino!"; }
+  else if (perc>=70){ selo.textContent="🏆"; titulo.textContent=quem+", Explorador Brilhante!"; frase.textContent="Muito bom! Revise um pouquinho e fica perfeito."; }
+  else if (perc>=50){ selo.textContent="🧭"; titulo.textContent=quem+", Aprendiz Corajoso!"; frase.textContent="Bom caminho! Vamos treinar mais."; }
+  else { selo.textContent="🌱"; titulo.textContent=quem+", Semente de Explorador!"; frase.textContent="Não desista! Recomeçar faz parte da aventura."; }
+
+  var pior=-1,piorPerc=999;
+  for (var k=0;k<NUM_FASES;k++){
+    if (FASES[k].tipoFase!=="quiz") continue;
+    var tk=totalPorFase[k]>0?totalPorFase[k]:FASES[k].questoes.length;
+    var pk=tk>0?acertosPorFase[k]/tk:0;
+    if (totalPorFase[k]>0 && pk<piorPerc){ piorPerc=pk; pior=k; }
+  }
+  var dicaTxt="👉 <b>Continue praticando a leitura em voz alta</b> para sentir a sílaba tônica das palavras!";
+  if (pior>=0){
+    var tp=FASES[pior].tipo;
+    if (tp==="tonica") dicaTxt="👉 <b>Sílaba tônica:</b> fale a palavra alto e devagar; a mais forte é a tônica.";
+    else if (tp==="contar") dicaTxt="👉 <b>Contar sílabas:</b> bata uma palma a cada pedacinho da palavra.";
+    else if (tp==="classifica") dicaTxt="👉 <b>Classificação:</b> conte do fim — última, penúltima ou antepenúltima.";
+    else if (tp==="acento") dicaTxt="👉 <b>Acentuação:</b> toda proparoxítona acentua; oxítonas em a,e,o também.";
+    else if (tp==="regra") dicaTxt="👉 <b>Regras:</b> pense na classificação e na terminação da palavra.";
+  }
+  $("rel-dicas").innerHTML="<b>Dica da Coruja Letra para você melhorar:</b><br>"+dicaTxt;
+}
+function contarBonus(fase){
+  if (fase.tipoFase==="cacapalavras") return fase.palavras.length;
+  if (fase.tipoFase==="memoria") return fase.pares.length;
+  if (fase.tipoFase==="quebracabeca") return fase.palavras.length;
+  if (fase.tipoFase==="verdadeirofalso") return fase.afirmacoes.length;
+  return 0;
+}
+function avaliar(ac,tt){
+  if (tt===0) return "—";
+  var p=ac/tt;
+  if (p>=0.9) return "🟢 Excelente";
+  if (p>=0.7) return "🔵 Muito bom";
+  if (p>=0.5) return "🟡 Regular";
+  return "🔴 Treinar mais";
+}
+
+/* ---------------- REINICIAR ---------------- */
+function reiniciar(){
+  faseAtual=0; questaoAtual=0; pontos=0; vidas=3; respondeu=false; intervaloIndice=0;
+  for (var i=0;i<NUM_FASES;i++){ acertosPorFase[i]=0; totalPorFase[i]=0; faseConcluida[i]=false; }
+  esconderTudo();
+  $("tela-inicio").classList.remove("escondido");
+  atualizarPlacar();
+}
+
+/* ---------------- INICIALIZAÇÃO ---------------- */
+window.onload=function(){
+  atualizarPlacar();
+  $("btn-comecar").onclick=function(){
+    var n=$("input-nome").value;
+    if (n && n.replace(/\s/g,"").length>0){ nomeJogador=n.substring(0,16); }
+    atualizarPlacar(); embarcar();
+  };
+  $("btn-embarcar").onclick=embarcar;
+  $("btn-proximo").onclick=proximoQuiz;
+  $("btn-bonus-fim").onclick=function(){ mostrarTransicao(); };
+  $("btn-continuar-mapa").onclick=aposTransicao;
+  $("btn-fim-intervalo").onclick=function(){ embarcar(); };
+  $("btn-reiniciar").onclick=reiniciar;
+};
+
+</script>
+</body>
+</html>
